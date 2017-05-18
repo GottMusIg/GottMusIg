@@ -57,29 +57,8 @@ import lombok.extern.slf4j.Slf4j;
         File jsonResult = createFile(SIMULATION_CRAFT_RESULTS_DIR, JSON);
         File simcProfile = createFile(SIMULATION_CRAFT_PROFILES_DIR, SIMC);
 
-        SimulationCraft simulationcraft = null;
-        String simcExecutionString = "";
-
-        if (inputs.simulateAndCompareItems()) {
-
-            File standartProfile = getMatchingProfileFile(inputs.getClazz(), inputs.getSpec());
-            simcExecutionString = "\"" + standartProfile.getAbsolutePath() + "\" " + inputs.getCommandString() + " " + SimcCommands.RESULT
-                    .getCommand() + jsonResult.getAbsolutePath();
-
-        } else {
-
-            if(inputs.simulatePlayer()){
-                simcExecutionString =
-                        SimcCommands.ARMORY.getCommand() + "\"" + inputs.getRegion() + "," + inputs.getServer() + "," + inputs
-                                .getUser() + "\" " + inputs.getCommandString() + " " + SimcCommands.RESULT.getCommand() + jsonResult
-                                .getAbsolutePath();
-            } else {
-
-                File raidFile = getRaidFile();
-                simcExecutionString = "\"" + raidFile.getAbsolutePath() + "\" " + SimcCommands.RESULT
-                        .getCommand() + jsonResult.getAbsolutePath();
-            }
-        }
+        SimulationCraft simulationcraft;
+        String simcExecutionString = getSimcCommandFor(jsonResult, inputs);
 
         Files.write(simcProfile.toPath(), simcExecutionString.getBytes());
 
@@ -127,6 +106,27 @@ import lombok.extern.slf4j.Slf4j;
             e.printStackTrace();
         }
         return simulationcraft;
+    }
+
+    private String getSimcCommandFor(File outputFile, SimulationCraftInputs input) throws Exception {
+
+        switch (input.getCommandType()){
+
+        case SIMULATE_RAID:
+            File raidFile = getRaidFile();
+            return "\"" + raidFile.getAbsolutePath() + "\" " + SimcCommands.RESULT
+                    .getCommand() + outputFile.getAbsolutePath();
+        case COMPARE_ITEMS:
+            File standartProfile = getMatchingProfileFile(input.getClazz(), input.getSpec());
+            return "\"" + standartProfile.getAbsolutePath() + "\" " + input.getCommandString() + " " + SimcCommands.RESULT
+                    .getCommand() + outputFile.getAbsolutePath();
+        case SIMULATE_PLAYER:
+            return
+                    SimcCommands.ARMORY.getCommand() + "\"" + input.getRegion() + "," + input.getServer() + "," + input
+                            .getUser() + "\" " + input.getCommandString() + " " + SimcCommands.RESULT.getCommand() + outputFile
+                            .getAbsolutePath();
+        }
+        throw new Exception("No type was defined for simulation");
     }
 
     private File getRaidFile() throws Exception {

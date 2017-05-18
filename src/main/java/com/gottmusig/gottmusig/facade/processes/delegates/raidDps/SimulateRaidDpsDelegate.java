@@ -27,10 +27,7 @@ public class SimulateRaidDpsDelegate implements JavaDelegate {
                 .build();
 
         SimulationCraft simulationCraft = simCraftExecuter.execute(inputs);
-
         execution.setVariable(ProcessVars.SIMULATIONCRAFT, simulationCraft);
-
-
-
+        
     }
 }

@@ -43,9 +43,6 @@ public class Control {
 
 		try {
 			simulationcraft = simcExecuter.execute(inputs);
-			// Test output
-			System.out.println(simulationcraft.getSim().getPlayers().get(0).getName());
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

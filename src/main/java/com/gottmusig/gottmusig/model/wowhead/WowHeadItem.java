@@ -303,7 +303,8 @@ public class WowHeadItem implements Serializable {
         for(int i=0;i<this.bonuses.size()-1;i++){
             bonuses += (this.bonuses.get(i)+"/");
         }
-        return (bonuses+= this.bonuses.get(this.bonuses.size()-1)); //avoid '/' after the last id
+        bonuses += this.bonuses.get(this.bonuses.size()-1); //avoid '/' after the last id
+        return bonuses;
     }
 
     public String getSimulationName(){
@@ -318,5 +319,4 @@ public class WowHeadItem implements Serializable {
         replacedString = replacedString.replaceAll("-", "_");
         return replacedString;
     }
-    
 }

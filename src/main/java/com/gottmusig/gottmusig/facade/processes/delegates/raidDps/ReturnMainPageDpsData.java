@@ -16,7 +16,7 @@ public class ReturnMainPageDpsData implements JavaDelegate {
         SimulationCraft simulationCraft = (SimulationCraft) execution.getVariable(ProcessVars.SIMULATIONCRAFT);
         log.debug(simulationCraft.getSim().getPlayers().get(0).getName());
         log.debug(""+simulationCraft.getSim().getPlayers().get(0).getCollectedData().getDps().getMean());
-        //
 
+        //TODO send to leons rest api
     }
 }
