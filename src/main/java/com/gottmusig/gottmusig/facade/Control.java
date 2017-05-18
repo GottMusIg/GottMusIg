@@ -28,6 +28,7 @@ public class Control {
 	public String startItemComparisonProcess(String simcVersion){
 		return bpeAdapter.startItemRankingCalculation(simcVersion);
 	}
+
 	public SimulationCraft getSpecificSimulationCraftData(String region, String server, String user) {
 
 		SimulationCraft simulationcraft = null;
