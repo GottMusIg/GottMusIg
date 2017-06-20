@@ -28,6 +28,7 @@ public class Control {
 	public String startItemComparisonProcess(String simcVersion){
 		return bpeAdapter.startItemRankingCalculation(simcVersion);
 	}
+
 	public SimulationCraft getSpecificSimulationCraftData(String region, String server, String user) {
 
 		SimulationCraft simulationcraft = null;
@@ -42,9 +43,6 @@ public class Control {
 
 		try {
 			simulationcraft = simcExecuter.execute(inputs);
-			// Test output
-			System.out.println(simulationcraft.getSim().getPlayers().get(0).getName());
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
