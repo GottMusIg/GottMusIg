@@ -19,8 +19,11 @@ public class GetItemsFromWowHeadDelegate implements JavaDelegate {
 
     @Override public void execute(DelegateExecution execution) throws Exception {
 
+
         WowHeadOpt wowHeadOpt = (WowHeadOpt) execution.getVariable(ProcessVars.WOW_HEAD_OPTION);
+
         WowHead wowHead = wowHeadDatabaseGateway.getItemsFor(wowHeadOpt.getClazz(), wowHeadOpt.getMinLvl(), wowHeadOpt.getMaxLvl(), wowHeadOpt.getSlot(), wowHeadOpt.getQuality());
+
         execution.setVariable(ProcessVars.WOW_HEAD_ITEMS,wowHead.getItems());
 
     }

@@ -25,7 +25,7 @@ public class CreateClassSlotSpecTuplesDelegate implements JavaDelegate{
 
         List<WowHeadOpt> wowHeadOpts = new ArrayList<>();
         List<Map<WowHeadItem, Double>> simulationResults = new ArrayList<>();
-
+        
         for(Classes clazz : Classes.values()){
 
             for(ClassSpec spec : ClassSpec.getSpecBy(clazz)){

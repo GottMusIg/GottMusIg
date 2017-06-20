@@ -36,7 +36,7 @@ public class WowHead implements Serializable {
 
     @JsonProperty("items")
     public void setItems(List<WowHeadItem> items) {
-        this.items = removeDoubleItems(items);
+        this.items = removeDoubleItems2(items);
     }
 
     @JsonAnyGetter
@@ -49,8 +49,17 @@ public class WowHead implements Serializable {
         this.additionalProperties.put(name, value);
     }
 
-    private List<WowHeadItem> removeDoubleItems(List<WowHeadItem> items){
+    private List<WowHeadItem> removeDoubleItems(List<WowHeadItem> originalList){
+        log.debug("Original item size: "+originalList.size());
+        List<WowHeadItem> deduped = originalList.stream().distinct().collect(Collectors.toList());
+        log.debug("New size :"+deduped.size());
+        return deduped;
+    }
+
+    private List<WowHeadItem> removeDoubleItems2(List<WowHeadItem> items){
+
         return new ArrayList<WowHeadItem>(new LinkedHashSet<WowHeadItem>(items));
+
     }
 
 }

@@ -1,5 +1,6 @@
 package com.gottmusig.gottmusig.facade.processes.delegates.itemRanking.sub;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,9 @@ public class CreateItemDpsRankingDelegate implements JavaDelegate {
         List<WowHeadItem> items = (List<WowHeadItem>) execution.getVariable(ProcessVars.WOW_HEAD_ITEMS);
         SimulationCraft simc = (SimulationCraft) execution.getVariable(ProcessVars.SIMULATIONCRAFT);
 
-        Map<WowHeadItem, Double> dpsPerItem = new LinkedHashMap<>();
+
+
+        Map<WowHeadItem, Double> dpsPerItem = new HashMap<WowHeadItem, Double>();
 
         for (Player simulatedItem : simc.getSim().getPlayers()) {
 
@@ -32,10 +35,13 @@ public class CreateItemDpsRankingDelegate implements JavaDelegate {
                 if (simulationName.equals(item.getSimulationName())) {
                     dpsPerItem.put(item, simulatedItem.getCollectedData().getDps().getMean());
                 }
+
             }
         }
 
         dpsPerItem = sortMapByDps(dpsPerItem);
+
+        log.debug(items.size() + "vs" + dpsPerItem.size());
 
         for (Map.Entry<WowHeadItem, Double> itemByDps : dpsPerItem.entrySet()) {
             log.debug(itemByDps.getKey().getName() + " --> " + itemByDps.getValue());
@@ -48,7 +54,7 @@ public class CreateItemDpsRankingDelegate implements JavaDelegate {
     }
 
     private Map<WowHeadItem, Double> sortMapByDps(Map<WowHeadItem, Double> map) {
-        return map.entrySet().stream().sorted(Map.Entry.comparingByValue()).distinct()
+        return map.entrySet().stream().sorted(Map.Entry.comparingByValue())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
     }
 }
