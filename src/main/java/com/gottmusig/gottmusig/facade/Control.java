@@ -37,7 +37,7 @@ public class Control {
 				.server(server) //
 				.user(user)//
 				.commandType(SimcCommands.SIMULATE_PLAYER)
-				.commandString("calculate_scale_factors=0") //TODO
+				.commandString("calculate_scale_factors=0 iterations=300") //TODO
 				.build();
 
 		try {

@@ -52,16 +52,16 @@ public class SimCraftDataBoundary {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSimulationCraftData(@QueryParam("region") String region, //
-			@QueryParam("server") String server, @QueryParam("user") String user) {
+			@QueryParam("realm") String realm, @QueryParam("user") String user) {
 
-		SimulationCraft simulationCraftData = control.getSpecificSimulationCraftData(region, server, user);
+		SimulationCraft simulationCraftData = control.getSpecificSimulationCraftData(region, realm, user);
 		return Response.status(200).entity(simulationCraftData).build();
 	}
 
 	@Path("itemComparison")
 	@GET
 	@Produces(MediaType.TEXT_HTML)
-	public Response testCamunda(@QueryParam("simcVersion") String simcVersion){
+	public Response startItemComparisonProcess(@QueryParam("simcVersion") String simcVersion){
 
 		String processId = control.startItemComparisonProcess(simcVersion);
 		return Response.ok().entity(processId).build();
