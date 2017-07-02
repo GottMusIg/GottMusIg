@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gottmusig.gottmusig.model.dpscalculation.SimcCommands;
@@ -15,34 +19,21 @@ import com.gottmusig.gottmusig.model.wowhead.ClassSpec;
 import com.gottmusig.gottmusig.model.wowhead.Classes;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j @Service public class SimCraftExecuter {
-
-    // TODO ACHTUNG KEINE LEERZEICHEN IM PFAD -- SIMC IST BEHINDERT
-    private static final String ROOT_DIR = "C://Softwareengineering/";
-
-    private static final String SIMC_VERSION = "720-02";
-
-    private static final String SIMULATION_CRAFT_DIR = ROOT_DIR + "Simulationcraft/" + SIMC_VERSION;
-
-    private static final String SIMULATION_CRAFT_STANDARD_PROFILES_DIR = SIMULATION_CRAFT_DIR + "/profiles/";
-
-    private static final String SIMULATION_CRAFT_RESULTS_DIR = ROOT_DIR + "Results";
-
-    private static final String SIMULATION_CRAFT_PROFILES_DIR = ROOT_DIR + "Profiles";
-
-    private static final String MYTHIC = "M";
-
-    private static final String RAID = "Raid";
-
-    private static final String JSON = ".json";
-
-    private static final String SIMC = ".simc";
+@Slf4j
+@Service
+@PropertySource("classpath:simc.properties")
+public class SimCraftExecuter {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    public SimCraftExecuter() {
-        checkForExistingDir(SIMULATION_CRAFT_RESULTS_DIR);
-        checkForExistingDir(SIMULATION_CRAFT_PROFILES_DIR);
+    @Autowired
+    private Environment env;
+
+    @Autowired
+    public SimCraftExecuter(Environment env, @Value("${SIMULATION_CRAFT_TMP_RESULTS_DIR}") String tmp_result, @Value("${SIMULATION_CRAFT_TMP_PROFILES_DIR}") String tmp_profile) {
+        log.info("---------------------------->"+env.getRequiredProperty("SIMULATION_CRAFT_TMP_RESULTS_DIR"));
+        checkForExistingDir(tmp_result);
+        checkForExistingDir(tmp_profile);
     }
 
     private void checkForExistingDir(String dirPath) {
@@ -54,8 +45,8 @@ import lombok.extern.slf4j.Slf4j;
 
     public SimulationCraft execute(SimulationCraftInputs inputs) throws Exception {
 
-        File jsonResult = createFile(SIMULATION_CRAFT_RESULTS_DIR, JSON);
-        File simcProfile = createFile(SIMULATION_CRAFT_PROFILES_DIR, SIMC);
+        File jsonResult = createFile(env.getRequiredProperty("SIMULATION_CRAFT_TMP_RESULTS_DIR"), env.getRequiredProperty("JSON"));
+        File simcProfile = createFile(env.getRequiredProperty("SIMULATION_CRAFT_TMP_PROFILES_DIR"), env.getRequiredProperty("SIMC"));
 
         SimulationCraft simulationcraft = null;
         String simcExecutionString = "";
@@ -75,7 +66,7 @@ import lombok.extern.slf4j.Slf4j;
                                 .getAbsolutePath();
             } else {
 
-                File raidFile = getRaidFile();
+                File raidFile = new File(env.getRequiredProperty("SIMULATION_CRAFT_RAID_FILE"));
                 simcExecutionString = "\"" + raidFile.getAbsolutePath() + "\" " + SimcCommands.RESULT
                         .getCommand() + jsonResult.getAbsolutePath();
             }
@@ -83,8 +74,8 @@ import lombok.extern.slf4j.Slf4j;
 
         Files.write(simcProfile.toPath(), simcExecutionString.getBytes());
 
-        String command = "simc.exe input=\"" + simcProfile.getAbsolutePath() + "\"";
-        ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
+        String command = env.getRequiredProperty("RUN_SIMC")+"\"" + simcProfile.getAbsolutePath() + "\"";
+        ProcessBuilder builder = new ProcessBuilder(env.getRequiredProperty("CMD"), "/"+env.getRequiredProperty("PARTITION"), command);
 
         simulationcraft = getSimulationCraftData(builder, jsonResult);
 
@@ -96,7 +87,7 @@ import lombok.extern.slf4j.Slf4j;
     private SimulationCraft getSimulationCraftData(ProcessBuilder builder, File jsonResult) throws IOException {
 
         builder.redirectErrorStream(true);
-        builder.directory(new File(SIMULATION_CRAFT_DIR));
+        builder.directory(new File(env.getRequiredProperty("SIMULATION_CRAFT_DIR")));
 
         Process p = builder.start();
         BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -129,33 +120,9 @@ import lombok.extern.slf4j.Slf4j;
         return simulationcraft;
     }
 
-    private File getRaidFile() throws Exception {
-
-        File[] files = new File(SIMULATION_CRAFT_STANDARD_PROFILES_DIR).listFiles();
-
-        for (File file : files) {
-            if (file.isDirectory() && file.getName().contains(MYTHIC)) {
-
-                for (File profile : file.listFiles()) {
-
-                    String fileName = profile.getName().toLowerCase();
-
-                    if (fileName.startsWith(RAID.toLowerCase()) && fileName.contains(MYTHIC.toLowerCase())) {
-                        return profile;
-                    }
-                }
-            }
-        }
-        throw new Exception("TODO");
-    }
-
     private File getMatchingProfileFile(Classes clazz, ClassSpec spec) throws Exception {
 
-        File[] files = new File(SIMULATION_CRAFT_STANDARD_PROFILES_DIR).listFiles();
-
-        for (File file : files) {
-            if (file.isDirectory() && file.getName().contains(MYTHIC)) {
-
+        File file = new File(env.getRequiredProperty("SIMULATION_CRAFT_STANDARD_PROFILES_DIR"));
                 for (File profile : file.listFiles()) {
 
                     String fileName = profile.getName().toLowerCase();
@@ -164,8 +131,6 @@ import lombok.extern.slf4j.Slf4j;
                         return profile;
                     }
                 }
-            }
-        }
 
         throw new Exception("Could not find a profile for: " + clazz.name() + ", " + spec.name()); //TODO
 
