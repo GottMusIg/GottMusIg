@@ -13,13 +13,17 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.importer.ZipImporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import static org.junit.Assert.*;
 
 @Slf4j
 public abstract class AbstractIT extends AbstractBoundaryTest {
 
 	@ArquillianResource
 	private URI baseUri;
+
+	private ObjectMapper mapper = new ObjectMapper();
 
 	@Deployment(testable = false)
 	public static WebArchive createTestArchive() {
@@ -59,6 +63,10 @@ public abstract class AbstractIT extends AbstractBoundaryTest {
 		}
 	}
 
+	protected Object getObject(String jsonString, Object obj) throws IOException {
+		return mapper.readValue(jsonString, obj.getClass());
+	}
+
 	protected String get(String path) {
 
 		Client c = ClientBuilder.newClient();
@@ -69,5 +77,7 @@ public abstract class AbstractIT extends AbstractBoundaryTest {
 
 		return responseMsg;
 	}
+
+
 
 }

@@ -6,6 +6,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.extension.process_test_coverage.junit.rules.TestCoverageProcessEngineRuleBuilder;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ public class ItemSimulationTest extends ProcessTestBase {
     }
 
     @Test
+    @Ignore
     public void itemSimulationProcessShouldRun(){
 
         String id = bpeAdapter.startItemRankingCalculation("123");
